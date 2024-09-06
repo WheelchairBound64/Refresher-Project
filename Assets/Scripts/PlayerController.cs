@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 input;
     private Rigidbody rb;
     [SerializeField] float speed;
+    [SerializeField] Animator animator;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,7 +19,7 @@ public class PlayerController : MonoBehaviour
     {
         input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
-        Debug.Log(input);
+        animator.SetFloat("moveSpeed", input.magnitude);
     }
 
     private void FixedUpdate()
