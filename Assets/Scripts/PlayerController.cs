@@ -1,23 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     private Vector2 input;
     private Rigidbody rb;
     [SerializeField] float speed;
     [SerializeField] Animator animator;
+
+    IA_PlayerActions playerActions;
     // Start is called before the first frame update
     void Start()
     {
+        playerActions = new IA_PlayerActions();
+        playerActions.Player.Enable();
         rb = GetComponent<Rigidbody>();
+
+        playerActions.Player.Jump.performed += OnJump;
     }
 
     // Update is called once per frame
     void Update()
     {
-        input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        //input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+
+        input = playerActions.Player.Move.ReadValue<Vector2>();
 
         animator.SetFloat("moveSpeed", input.magnitude);
     }
@@ -42,5 +50,14 @@ public class PlayerController : MonoBehaviour
         camForward.Normalize();
 
         return input.x * camRight + input.y * camForward;
+    }
+
+    public void OnJump(InputAction.CallbackContext ctx)
+    {
+        if (ctx.performed)
+        {
+            Debug.Log("Pressed Jump");
+            rb.AddForce(Vector3.up * 10, ForceMode.Impulse);
+        }
     }
 }
