@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
@@ -7,8 +8,10 @@ public class PlayerController : MonoBehaviour
     private Vector2 input;
     private Rigidbody rb;
     [SerializeField] float speed;
-    [SerializeField] Animator animator;
+    [SerializeField] float jumpHeight;
     [SerializeField] int jumps;
+    [SerializeField] Animator animator;
+    [SerializeField] GameObject steve;
 
     IA_PlayerActions playerActions;
     // Start is called before the first frame update
@@ -24,23 +27,23 @@ public class PlayerController : MonoBehaviour
     {
         //input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
-        input = playerActions.Player.Move.ReadValue<Vector2>();
+        input = playerActions.Player.Move.ReadValue<Vector2>();     //controls player movement using new movement system
 
-        animator.SetFloat("moveSpeed", input.magnitude);
+        animator.SetFloat("moveSpeed", input.magnitude);            //tells animator to animate moving animation
 
-        playerActions.Player.Jump.performed += OnJump;
+        playerActions.Player.Jump.performed += OnJump;              //calls jump function when space is pressed
     }
 
     private void FixedUpdate()
     {
 
-        var newInput = GetCameraBasedInput(input, Camera.main);
+        var newInput = GetCameraBasedInput(input, Camera.main);     //uses the camera position to adjust movement keys
         var newVelocity = new Vector3(newInput.x * speed * Time.fixedDeltaTime, rb.velocity.y, newInput.z * speed * Time.fixedDeltaTime);
 
         rb.velocity = newVelocity;
     }
 
-    Vector3 GetCameraBasedInput(Vector2 input, Camera cam)
+    Vector3 GetCameraBasedInput(Vector2 input, Camera cam)          //camera based movement
     {
         Vector3 camRight = cam.transform.right;
         camRight.y = 0;
@@ -53,21 +56,26 @@ public class PlayerController : MonoBehaviour
         return input.x * camRight + input.y * camForward;
     }
 
-    public void OnJump(InputAction.CallbackContext ctx)
+    public void OnJump(InputAction.CallbackContext ctx)             //jump function
     {
         if (ctx.performed && jumps > 0)
         {
-            Debug.Log("Pressed Jump");
-            rb.AddForce(Vector3.up * 10, ForceMode.Impulse);
+            rb.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
+            animator.SetTrigger("jump");
             jumps--;
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision collision)              //collision detection
     {
-        if(collision.gameObject.tag == "Ground" && jumps == 0)
+        if(collision.gameObject.tag == "Ground" && jumps == 0)      //prevents player from infinitely jumping
         {
             jumps++;
+        }
+
+        if(collision.gameObject.tag == "Respawn")                   //respawns player at 0,0,0 if they fall off the map
+        {
+            steve.transform.position = Vector3.zero;
         }
     }
 }
