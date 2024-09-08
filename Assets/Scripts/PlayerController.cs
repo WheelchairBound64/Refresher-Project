@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     [SerializeField] float speed;
     [SerializeField] Animator animator;
+    [SerializeField] int jumps;
 
     IA_PlayerActions playerActions;
     // Start is called before the first frame update
@@ -16,8 +17,6 @@ public class PlayerController : MonoBehaviour
         playerActions = new IA_PlayerActions();
         playerActions.Player.Enable();
         rb = GetComponent<Rigidbody>();
-
-        playerActions.Player.Jump.performed += OnJump;
     }
 
     // Update is called once per frame
@@ -28,6 +27,8 @@ public class PlayerController : MonoBehaviour
         input = playerActions.Player.Move.ReadValue<Vector2>();
 
         animator.SetFloat("moveSpeed", input.magnitude);
+
+        playerActions.Player.Jump.performed += OnJump;
     }
 
     private void FixedUpdate()
@@ -54,10 +55,19 @@ public class PlayerController : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed)
+        if (ctx.performed && jumps > 0)
         {
             Debug.Log("Pressed Jump");
             rb.AddForce(Vector3.up * 10, ForceMode.Impulse);
+            jumps--;
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.tag == "Ground" && jumps == 0)
+        {
+            jumps++;
         }
     }
 }
