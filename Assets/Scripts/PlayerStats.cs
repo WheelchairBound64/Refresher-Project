@@ -17,7 +17,10 @@ public class PlayerStats : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(currentHealth.amount <= 0) 
+        {
+            currentHealth.amount = maxHealth.amount;
+        }
     }
 
     private void OnCollisionEnter(Collision collision)

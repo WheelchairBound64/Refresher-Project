@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] int jumps;
     [SerializeField] Animator animator;
     [SerializeField] GameObject steve;
+    [SerializeField] Stat health;
 
     IA_PlayerActions playerActions;
     // Start is called before the first frame update
@@ -32,6 +33,11 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("moveSpeed", input.magnitude);            //tells animator to animate moving animation
 
         playerActions.Player.Jump.performed += OnJump;              //calls jump function when space is pressed
+
+        if(health.amount <= 0)
+        {
+            steve.transform.position = Vector3.zero;
+        }
     }
 
     private void FixedUpdate()

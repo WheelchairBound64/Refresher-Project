@@ -25,7 +25,7 @@ public class PoisonGas : MonoBehaviour
         yield return new WaitForSeconds(2.0f);
         while (health.amount > 0 && isTriggered == true)
         {
-            health.amount -= 7;
+            health.amount -= 33;
 
             yield return new WaitForSeconds(2.0f);
         }
