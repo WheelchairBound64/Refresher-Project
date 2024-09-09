@@ -4,15 +4,30 @@ using UnityEngine;
 
 public class PoisonGas : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] Stat health;
+
+    private bool isTriggered;
+
+    public void OnTriggerEnter(Collider collision)
     {
-        
+        isTriggered = true;
+        StartCoroutine(DrainHealth());
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnTriggerExit(Collider collision)
     {
-        
+        isTriggered = false;
+        StopCoroutine(DrainHealth());
+    }
+
+    IEnumerator DrainHealth()
+    {
+        yield return new WaitForSeconds(2.0f);
+        while (health.amount > 0 && isTriggered == true)
+        {
+            health.amount -= 7;
+
+            yield return new WaitForSeconds(2.0f);
+        }
     }
 }
